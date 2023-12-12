@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend    # has to match .spec.template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: frontend # has to match .spec.selector.matchLabels
+    spec:
+      containers:
+      - name: frontend
+        image: k8s.gcr.io/frontend:latest
+        ports:
+        - containerPort: 8081
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: frontend
+spec:
+  type: NodePort
+  ports:
+  - port: 8081
+    nodePort: 31234 #service对外开放端口
+  selector:
+    app: frontend
+

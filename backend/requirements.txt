@@ -1,0 +1,7 @@
+Flask==2.3.2
+Flask_Cors==3.0.7
+flask_sqlalchemy==3.0.5
+PyMySQL==1.1.0
+SQLAlchemy==2.0.15
+Werkzeug==2.3.4
+Cryptography==41.0.1

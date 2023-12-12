@@ -1,0 +1,64 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: flask-pvc
+spec:
+  storageClassName: openebs-hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-bkd
+spec:
+  selector:
+    matchLabels:
+      app: flask-bkd
+  replicas: 1
+  strategy:
+    type: Recreate
+    rollingUpdate: null
+  template:
+    metadata:
+      labels:
+        app: flask-bkd
+    spec:
+      containers:
+      - name: flask-bkd
+        image: k8s.gcr.io/backend2:latest
+        ports:
+        - containerPort: 5001
+        volumeMounts:
+        - name: flask-vol
+          mountPath: /app/images 
+          subPath: images  
+          readOnly: false     
+        - name: flask-vol
+          mountPath: /app/logs
+          subPath: logs
+          readOnly: false             
+      volumes:
+      # 挂载 PVC
+      - name: flask-vol
+        persistentVolumeClaim:
+          claimName: flask-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-bkd
+spec:
+  type: NodePort
+  ports:
+  - name: flask-port
+    port: 5001 
+    nodePort: 32680
+  selector:
+    app: flask-bkd
+
